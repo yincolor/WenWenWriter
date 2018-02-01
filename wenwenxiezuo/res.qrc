@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/book.svg</file>
+        <file>image/chapter.svg</file>
+        <file>image/logo.png</file>
+        <file>image/volume.svg</file>
+        <file>qss/default.qss</file>
+        <file>image/newBook.png</file>
+        <file>image/newChapter.png</file>
+        <file>image/newVolume.png</file>
+        <file>image/delet.svg</file>
+        <file>image/saveAll.svg</file>
+        <file>image/close.svg</file>
+    </qresource>
+</RCC>
