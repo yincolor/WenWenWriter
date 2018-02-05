@@ -22,6 +22,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 
+    if(!FileConsole::isFilesComplete())//
+    {
+        qDebug()<<"未检测到目录结构，已经初始化完毕";
+    }
+
     //以下是关于设置treeview
    //加载json数据
     set_book_list();
@@ -179,17 +184,17 @@ int MainWindow::out_list_tree()
 
 int MainWindow::fresh_tree_view()
 {
-    QIcon* bookIcon = new QIcon(QStringLiteral(":/image/book.svg"));
-    QIcon* volumeIcon = new QIcon(QStringLiteral(":/image/volume.svg"));
-    QIcon* chapterIcon = new QIcon(QStringLiteral(":/image/chapter.svg"));
+    QIcon* bookIcon = new QIcon(QStringLiteral(":/image/book.png"));
+    QIcon* volumeIcon = new QIcon(QStringLiteral(":/image/volume.png"));
+    QIcon* chapterIcon = new QIcon(QStringLiteral(":/image/chapter.png"));
     QStandardItemModel *model = new QStandardItemModel(ui->file_treeView);//树状视图的控制模型
     //设置标题名
 
     model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("名称")<<QStringLiteral("说明"));
 
 
-    QList<Book> *myBookList;
-    myBookList = &bookList;
+    //QList<Book> *myBookList;
+    //myBookList = &bookList;
     //读取书籍信息
     for(int bookIndex=0;bookIndex<bookList.count();bookIndex++)
     {
@@ -689,6 +694,126 @@ void MainWindow::on_closeAll_pushButton_clicked()
             {
                 chapterTabList->removeAt(i);
                 break;
+            }
+        }
+    }
+}
+
+
+
+void MainWindow::on_format_text_action_triggered()
+{
+    if(ui->text_tabWidget->currentIndex() == -1)//假如没有标签页则直接退出
+    {
+        qDebug()<<"无法格式化标签页-1";
+        return;
+    }
+    QWidget *tabWidget = ui->text_tabWidget->currentWidget();
+    QString tabName = tabWidget->findChild<QLabel*>(LabelObjName)->text();
+    QTextEdit *textEdit = tabWidget->findChild<QTextEdit*>(TextEditObjName);
+    QString tabText = textEdit->toPlainText();
+
+
+    QStringList textList = tabText.split("\n");
+    qDebug()<<"共有"<<textList.count()<<"自然段";
+    //清空textedit
+    textEdit->clear();
+    for(int index =0;index<textList.count();index++)
+    {
+        QString str = textList.at(index);
+        //删除空的字符串
+        if(str==""){continue;}
+        //删除字符串前后的空格和\t
+        str.replace(QRegExp("^[( *)(\t*)]"),"");
+        if(str==""){continue;}
+        str = "\t"+str;
+        //为字符串前面添加一个\t后边添加一个\n
+        str.append("\n");
+        //append到view中并
+        textEdit->append(str);
+    }
+}
+
+//打包成txt文件
+void MainWindow::on_package_action_triggered()
+{
+    on_saveAll_pushButton_clicked();
+    QModelIndex select = ui->file_treeView->currentIndex();
+    QString selectStr = select.data().toString();
+    QString bookName,selectType;//选中项的名称和类型
+
+
+    if(selectStr=="书籍"||selectStr=="卷"||selectStr=="章节")
+    {
+        selectType = selectStr;
+        bookName = select.sibling(select.row(),0).data().toString();
+    }
+    else
+    {
+        bookName = selectStr;
+        selectType = select.sibling(select.row(),1).data().toString();
+    }
+    if(selectType!="书籍")
+    {
+        QMessageBox::warning(this,"无效的打包","请选中需要打包的书籍！！",QMessageBox::Ok);
+        return;
+    }
+    else
+    {
+        QString pkgTxtPath = FileConsole::getPackagePath()+bookName+".txt";
+        QFile pkgFile(pkgTxtPath);
+        pkgFile.open(QFile::WriteOnly);
+
+        pkgFile.close();//先生成一个txt文件
+        pkgFile.open(QFile::ReadWrite|QIODevice::Append);
+        QTextStream out(&pkgFile);
+        out<<bookName<<"\n";//先写入小说名
+        for(int b_index=0;b_index<bookList.count();b_index++)
+        {
+            if(bookName == bookList[b_index].getBookName())
+            {
+                QList<Volume> *volumeList = bookList[b_index].getVolumeListPointer();
+                for(int v_index=0;v_index<volumeList->count();v_index++)
+                {
+                    Volume volume(volumeList->at(v_index));
+                    QString volumeName = volume.getVolumeName();
+                    QRegExp volumeRX("^(第.*卷.*)");
+                    if(volumeRX.exactMatch(volumeName))
+                    {
+                        qDebug()<<"这个卷名不需要添加头";
+                    }
+                    else
+                    {
+                        int volume_index = v_index+1;
+                        QString title = "\n第"+QString::number(volume_index,10);
+                        title = title+"卷 ";
+                        volumeName = title+volumeName;
+                    }
+                    qDebug()<<"打包卷："<<volumeName;
+                    out<<volumeName<<"\n";//添加卷名
+                    QList<Chapter>* chapterList = volume.getChapterListPointer();
+                    for(int c_index=0;c_index<chapterList->count();c_index++)
+                    {
+                        Chapter chapter(chapterList->at(c_index));
+                        QString chapterName = chapter.getChapterName();
+                        QString fileName = chapter.getFileName();
+                        QString text = FileConsole::readText(fileName);
+                        QRegExp chapterRX("^(第.*章.*)");
+                        if(chapterRX.exactMatch(chapterName))
+                        {
+                            qDebug()<<"这个章节名不需要添加头";
+                        }
+                        else
+                        {
+                            int chapter_index = c_index+1;
+                            QString title = "第"+QString::number(chapter_index,10);
+                            title = title+"章 ";
+                            chapterName = title+chapterName;
+                        }
+                        out<<chapterName<<"\n"<<text<<"\n";
+                    }
+
+                }
             }
         }
     }

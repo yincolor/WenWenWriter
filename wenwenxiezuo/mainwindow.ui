@@ -181,7 +181,7 @@
           </property>
           <property name="icon">
            <iconset resource="res.qrc">
-            <normaloff>:/image/delet.svg</normaloff>:/image/delet.svg</iconset>
+            <normaloff>:/image/delet.jpg</normaloff>:/image/delet.jpg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -220,7 +220,7 @@
           </property>
           <property name="icon">
            <iconset resource="res.qrc">
-            <normaloff>:/image/saveAll.svg</normaloff>:/image/saveAll.svg</iconset>
+            <normaloff>:/image/saveAll.png</normaloff>:/image/saveAll.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -249,7 +249,7 @@
           </property>
           <property name="icon">
            <iconset resource="res.qrc">
-            <normaloff>:/image/close.svg</normaloff>:/image/close.svg</iconset>
+            <normaloff>:/image/close.jpg</normaloff>:/image/close.jpg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -284,7 +284,25 @@
      <height>36</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>工具</string>
+    </property>
+    <addaction name="format_text_action"/>
+    <addaction name="package_action"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
+  <action name="format_text_action">
+   <property name="text">
+    <string>格式化文本</string>
+   </property>
+  </action>
+  <action name="package_action">
+   <property name="text">
+    <string>打包为txt文件</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

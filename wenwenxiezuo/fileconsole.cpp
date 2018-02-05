@@ -17,7 +17,8 @@ FileConsole::FileConsole()
 ///                     -xxxxxxx.txt
 /// \brief FileConsole::isFilesComplete
 /// \return 0
-int FileConsole::isFilesComplete(){
+bool FileConsole::isFilesComplete(){
+    bool i=true;
     QString file_path = QDir::homePath()+DocumentDir; // /home/xxx/.wenwenxiezuo/
     QString json_path = QDir::homePath()+JsonSrc; // /home/xxx/.wenwenxiezuo/info.json
     QString text_path = QDir::homePath()+TextDir; // /home/xx/./wenwenxiezuo/text/
@@ -25,19 +26,22 @@ int FileConsole::isFilesComplete(){
     QDir d1(file_path);
     if(!d1.exists()){
         d1.mkpath(file_path);
+        i=false;
     }
     //判断.wenwenxiezuo目录下是否有info.json文件
     QFile f_json(json_path);
     if(!f_json.exists()){
         f_json.open(QIODevice::WriteOnly);
         f_json.close();
+        i=false;
     }
     //判断./wenwenxiezuo下是否有text目录
     QDir d2(text_path);
     if(!d2.exists()){
         d2.mkpath(text_path);
+        i=false;
     }
-    return 0;
+    return i;
 }
 
 QString FileConsole::getJsonPath(){
@@ -133,5 +137,8 @@ void FileConsole::makeNewFile(QString fileName)
     f.close();
 }
 
-
+QString FileConsole::getPackagePath()
+{
+    return QDir::homePath()+"/Desktop/";
+}
 

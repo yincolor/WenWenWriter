@@ -3,6 +3,7 @@
 
 #include<QDebug>
 #include<QFile>
+#include<QIODevice>
 #include<QJsonDocument>
 #include<QJsonObject>
 #include<QJsonArray>
@@ -29,7 +30,7 @@ public:
     //获取text的目录地址 /home/xxx/.wenwenxiezuo/text
     static QString getTextPath();
     //判断家目录是否有固定的目录结构
-    static int isFilesComplete();
+    static bool isFilesComplete();
     //读取json文件
     static QString readJsonFile();
     //写入json文件
@@ -42,6 +43,9 @@ public:
     static int writeText(QString fileName,QByteArray content);
     //在./text/目录生成一个新的.txt文件
     static void makeNewFile(QString fileName);
+
+    //获取打包的地址 桌面
+    static QString getPackagePath();
 
 };
 

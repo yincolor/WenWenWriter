@@ -75,6 +75,12 @@ private slots:
 
     void on_closeAll_pushButton_clicked();
 
+
+
+    void on_format_text_action_triggered();
+
+    void on_package_action_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
